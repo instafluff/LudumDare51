@@ -1,0 +1,23 @@
+{
+  "name": "ludumdare51",
+  "version": "1.0.0",
+  "description": "TempoTimer, a timing game for Ludum Dare Game Jam 51",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pixelplush/LudumDare51.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pixelplush/LudumDare51/issues"
+  },
+  "homepage": "https://github.com/pixelplush/LudumDare51#readme",
+  "dependencies": {
+    "webwebweb": "^1.4.10"
+  }
+}

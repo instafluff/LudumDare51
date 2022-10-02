@@ -1,0 +1,128 @@
+<html>
+  <head>
+    <title>Pink Fluffy Unicorn Game Engine</title>
+    <link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet">
+    <link rel='stylesheet' href='web/unicorn.css' />
+    <script src="web/pinkfluffyunicorn.min.js"></script>
+    <script src="web/eventemitter.js"></script>
+    <script src="web/keyboard.js"></script>
+  </head>
+  <body>
+    <div id="unicorn-display"></div>
+    <script>
+      let counter = 0;
+      let didPlaySound = false;
+      let gamePrepTimer = 0;
+      let lastTimestamp = 0;
+      let hasGameStarted = false;
+      let timerStartTime = undefined;
+      let timerText = null;
+      let gameScore = 0;
+      const timerAlert10s = null;
+      const timerAlert5s = null;
+      const timerAlert2s = null;
+      function getRandomInt( number ) {
+        return Math.floor( number * Math.random() );
+      }
+
+      function Init() {
+        Unicorn.Load({
+          "fart": "assets/fart-2.wav",
+          "fart2": "assets/fart-wav-4.wav",
+          "yay": "assets/yay.mp3",
+        });
+        
+        Unicorn.AddText( "title", "Tempo Timer - Count to 10 seconds, in your head!", 50, 50, {
+          fontFamily: "Poppins",
+          fontSize: 36,
+          fontWeight: 'bold',
+          fill: "#00000"
+        });
+        
+        timerText = Unicorn.AddText( "timerText", "", 50, 200, {
+          fontFamily: "Poppins",
+          fontSize: 24,
+          fontWeight: 'bold',
+          fill: "#00000"
+        });
+        timerText.text = "Press Space to start!";
+
+        keyboard.on( "keydown", ( key ) => {
+          if( key === " " ) {
+            if( hasGameStarted ) {
+              // This is the end of the game
+              const timerDiff = lastTimestamp - timerStartTime;
+              const absoluteTimeDiff = Math.min( 1.0, Math.abs( ( 10000 - timerDiff ) / 1000 ) );
+              const gameScore = Math.floor( Math.pow( 1 - absoluteTimeDiff, 2 ) * 10000 ) / 100;
+              hasGameStarted = false;
+              timerText.text = `Your score is: ${gameScore} and your time was ${Math.floor( timerDiff / 10 ) / 100} seconds`;
+              Unicorn.PlaySound( "fart2", {
+                volume: 0.5
+              } );
+              setTimeout( () => {
+                Unicorn.PlaySound( "yay", {
+                volume: 0.5
+              } );
+              }, 700 );
+            }
+            else {
+              gamePrepTimer = 3000;
+              timerText.text = `Get ready...`;
+            }
+          }
+        });
+      }
+
+      function Update( timestamp, timeDiffInMs ) {
+        // Add Update Loop
+        // console.log( timestamp, timeDiffInMs );
+        lastTimestamp = timestamp;
+
+        if( gamePrepTimer > 0 ) {
+          gamePrepTimer -= timeDiffInMs;
+          if( gamePrepTimer <= 0 ) {
+            timerText.text = "Press space again in 10 seconds!";
+            hasGameStarted = true;
+            timerStartTime = timestamp;
+            Unicorn.PlaySound( "fart", {
+              volume: 0.5
+            } );
+          }
+          else {
+            const numberOfSecondsLeft = Math.floor( gamePrepTimer / 1000 ) + 1;
+            timerText.text = `Get ready... ${numberOfSecondsLeft}`;
+            // timerText.text = numberOfSecondsLeft;
+          }
+        }
+      }
+
+      function OnChatCommand( user, command, message, flags, extra ) {
+        // Handle Chat Commands
+        if( flags.broadcaster && command == "test" ) {
+          console.log( "!test was typed in chat" );
+        }
+      }
+
+      function OnChatMessage( user, message, flags, self, extra ) {
+        // Handle Chat Messages
+      }
+
+      window.addEventListener( "load", () => {
+        Unicorn.Create( "unicorn-display", {
+          width: 1280,
+          height: 720,
+          // background: "#000000",// "transparent",
+          background: "transparent",
+          init: Init,
+          update: Update,
+          channel: "Instafluff",
+          onCommand: OnChatCommand,
+          onChat: OnChatMessage,
+          screenWalls: false, // Default: true
+          gravity: { x: 0, y: 0 } // Default: { x: 0, y: 1 }
+        });
+        // Unicorn.SetDebug( true );
+      });
+    </script>
+  </body>
+</html>
