@@ -1,7 +1,6 @@
 <html>
   <head>
     <title>Pink Fluffy Unicorn Game Engine</title>
-    <link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet">
     <link rel='stylesheet' href='web/unicorn.css' />
     <script src="web/pinkfluffyunicorn.min.js"></script>
     <script src="web/eventemitter.js"></script>
@@ -10,6 +9,36 @@
   <body>
     <div id="unicorn-display"></div>
     <script>
+      
+      /* eslint-disable */
+      // include the web-font loader script
+      (function() {
+          const wf = document.createElement('script');
+          wf.src = `${document.location.protocol === 'https:' ? 'https' : 'http'
+      }://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js`;
+      wf.type = 'text/javascript';
+      wf.async = 'true';
+      const s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(wf, s);
+      }());
+      /* eslint-enabled */
+      
+      window.WebFontConfig = {
+          google: {
+              families: [ "Poppins" ]
+          },
+          active() {
+              CreateGame();
+          },
+      };
+
+      const colorBG = 0x1E2019;
+      const colorTitle = 0x8DAB7F;
+      const colorInstructions = 0x587B7F;
+      const colorText = 0xCFEE9E;
+
+      const gameWidth = 1280;
+      const gameHeight = 720;
       let counter = 0;
       let didPlaySound = false;
       let gamePrepTimer = 0;
@@ -32,19 +61,29 @@
           "yay": "assets/yay.mp3",
         });
         
-        Unicorn.AddText( "title", "Tempo Timer - Count to 10 seconds, in your head!", 50, 50, {
+        const titleText = Unicorn.AddText( "title", "Tempo Timer", gameWidth / 2, 80, {
+          fontFamily: "Poppins",
+          fontSize: 48,
+          fontWeight: 'bold',
+          fill: colorTitle
+        });
+        titleText.anchor.set( 0.5 );
+        
+        const instructionText = Unicorn.AddText( "instructions", "Count 10 seconds, in your head!", gameWidth / 2, 140, {
           fontFamily: "Poppins",
           fontSize: 36,
           fontWeight: 'bold',
-          fill: "#00000"
+          fill: colorInstructions
         });
+        instructionText.anchor.set( 0.5 );
         
-        timerText = Unicorn.AddText( "timerText", "", 50, 200, {
+        timerText = Unicorn.AddText( "timerText", "", gameWidth / 2, gameHeight / 2, {
           fontFamily: "Poppins",
-          fontSize: 24,
+          fontSize: 64,
           fontWeight: 'bold',
-          fill: "#00000"
+          fill: colorText
         });
+        timerText.anchor.set( 0.5 );
         timerText.text = "Press Space to start!";
 
         keyboard.on( "keydown", ( key ) => {
@@ -55,7 +94,7 @@
               const absoluteTimeDiff = Math.min( 1.0, Math.abs( ( 10000 - timerDiff ) / 1000 ) );
               const gameScore = Math.floor( Math.pow( 1 - absoluteTimeDiff, 2 ) * 10000 ) / 100;
               hasGameStarted = false;
-              timerText.text = `Your score is: ${gameScore} and your time was ${Math.floor( timerDiff / 10 ) / 100} seconds`;
+              timerText.text = `Your score is: ${gameScore}\n\nYour time was: ${Math.floor( timerDiff / 10 ) / 100} seconds`;
               Unicorn.PlaySound( "fart2", {
                 volume: 0.5
               } );
@@ -77,6 +116,10 @@
         // Add Update Loop
         // console.log( timestamp, timeDiffInMs );
         lastTimestamp = timestamp;
+        // if( hasGameStarted ) {
+        //   console.log( timestamp - timerStartTime );
+        // }
+        // timerText.text = `${timestamp - timerStartTime}`;
 
         if( gamePrepTimer > 0 ) {
           gamePrepTimer -= timeDiffInMs;
@@ -107,12 +150,12 @@
         // Handle Chat Messages
       }
 
-      window.addEventListener( "load", () => {
+      function CreateGame() {
         Unicorn.Create( "unicorn-display", {
-          width: 1280,
-          height: 720,
-          // background: "#000000",// "transparent",
-          background: "transparent",
+          width: gameWidth,
+          height: gameHeight,
+          background: colorBG,// "transparent",
+          // background: "transparent",
           init: Init,
           update: Update,
           channel: "Instafluff",
@@ -122,7 +165,7 @@
           gravity: { x: 0, y: 0 } // Default: { x: 0, y: 1 }
         });
         // Unicorn.SetDebug( true );
-      });
+      };
     </script>
   </body>
 </html>
