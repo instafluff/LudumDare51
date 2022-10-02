@@ -37,8 +37,8 @@
       const colorInstructions = 0x587B7F;
       const colorText = 0xCFEE9E;
 
-      const gameWidth = 1280;
-      const gameHeight = 720;
+      const gameWidth = 948;
+      const gameHeight = 533;
       let counter = 0;
       let didPlaySound = false;
       let gamePrepTimer = 0;
@@ -56,8 +56,8 @@
 
       function Init() {
         Unicorn.Load({
-          "fart": "assets/fart-2.wav",
-          "fart2": "assets/fart-wav-4.wav",
+          "tick": "assets/548518_1442200-lq.mp3",
+          "start": "assets/250552_4570971-lq.mp3",
           "yay": "assets/yay.mp3",
         });
         
@@ -77,9 +77,9 @@
         });
         instructionText.anchor.set( 0.5 );
         
-        timerText = Unicorn.AddText( "timerText", "", gameWidth / 2, gameHeight / 2, {
+        timerText = Unicorn.AddText( "timerText", "", gameWidth / 2, 2 * gameHeight / 3, {
           fontFamily: "Poppins",
-          fontSize: 64,
+          fontSize: 50,
           fontWeight: 'bold',
           fill: colorText
         });
@@ -95,7 +95,7 @@
               const gameScore = Math.floor( Math.pow( 1 - absoluteTimeDiff, 2 ) * 10000 ) / 100;
               hasGameStarted = false;
               timerText.text = `Your score is: ${gameScore}\n\nYour time was: ${Math.floor( timerDiff / 10 ) / 100} seconds`;
-              Unicorn.PlaySound( "fart2", {
+              Unicorn.PlaySound( "start", {
                 volume: 0.5
               } );
               setTimeout( () => {
@@ -107,6 +107,9 @@
             else {
               gamePrepTimer = 3000;
               timerText.text = `Get ready...`;
+              Unicorn.PlaySound( "tick", {
+                volume: 0.5
+              } );
             }
           }
         });
@@ -122,12 +125,13 @@
         // timerText.text = `${timestamp - timerStartTime}`;
 
         if( gamePrepTimer > 0 ) {
+          const prevPrepTime = gamePrepTimer;
           gamePrepTimer -= timeDiffInMs;
           if( gamePrepTimer <= 0 ) {
             timerText.text = "Press space again in 10 seconds!";
             hasGameStarted = true;
             timerStartTime = timestamp;
-            Unicorn.PlaySound( "fart", {
+            Unicorn.PlaySound( "tick", {
               volume: 0.5
             } );
           }
@@ -135,6 +139,12 @@
             const numberOfSecondsLeft = Math.floor( gamePrepTimer / 1000 ) + 1;
             timerText.text = `Get ready... ${numberOfSecondsLeft}`;
             // timerText.text = numberOfSecondsLeft;
+            if( ( prevPrepTime > 2000 && gamePrepTimer <= 2000 ) ||
+                ( prevPrepTime > 1000 && gamePrepTimer <= 1000 ) ) {  
+              Unicorn.PlaySound( "tick", {
+                volume: 0.5
+              } );
+            }
           }
         }
       }
